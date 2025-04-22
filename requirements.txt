@@ -1,0 +1,11 @@
+groq
+argparse
+os
+base64
+BeautifulSoup
+load_dotenv
+requests
+beautifulsoup4
+lxml
+python-dotenv
+nltk
