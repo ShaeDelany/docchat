@@ -36,6 +36,27 @@ def llm(messages, temperature=1):
 def chunk_text_by_words(text, max_words=5, overlap=2):
     """
     Splits text into overlapping chunks by word count.
+
+    Parameters:
+        text (str): The input text to split.
+        max_words (int): Maximum number of words per chunk.
+        overlap (int): Number of overlapping words between chunks.
+
+    Returns:
+        List[str]: A list of text chunks.
+
+    Examples:
+        >>> chunk_text_by_words("The quick brown fox jumps over the lazy dog", max_words=5, overlap=2)
+        ['The quick brown fox jumps', 'fox jumps over the lazy', 'the lazy dog']
+
+        >>> chunk_text_by_words("This is a short sentence", max_words=3, overlap=1)
+        ['This is a', 'a short sentence', 'sentence']
+
+        >>> chunk_text_by_words("One two", max_words=5, overlap=2)
+        ['One two']
+
+        >>> chunk_text_by_words("", max_words=5, overlap=2)
+        []
     """
     words = text.split()
     chunks = []
@@ -49,15 +70,25 @@ def chunk_text_by_words(text, max_words=5, overlap=2):
 
     return chunks
 
-
 def score_chunk(chunk: str, query: str, language: str = "english") -> float:
     """
-    Scores a chunk against a query using Jaccard similarity of lemmatized sets.
-    Works best for English.
+    Scores a chunk of text against a query using Jaccard similarity between 
+    sets of lemmatized words with stopwords removed.
+    
+    Examples:
+        >>> round(score_chunk("The sun is bright and hot.", "How hot is the sun?"), 2)
+        0.67
+        >>> round(score_chunk("The red car is speeding down the road.", "What color is the car?"), 2)
+        0.2
+        >>> score_chunk("Bananas are yellow.", "How do airplanes fly?")
+        0.0
+        >>> score_chunk("", "Is this empty?")
+        0.0
+        >>> score_chunk("Some random sentence", "")
+        0.0
     """
-
     def preprocess(text):
-        tokens = word_tokenize(text.lower())
+        tokens = word_tokenize(text.lower(), preserve_line=True)
         stop_words = set(stopwords.words(language)) if language in stopwords.fileids() else set()
         lemmatizer = WordNetLemmatizer()
         processed = set(
