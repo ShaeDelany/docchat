@@ -164,6 +164,23 @@ def load_text(filepath_or_url):
             else:
                 return f.read().decode('utf-8', errors='ignore')
 
+def find_relevant_chunks(text, query, num_chunks=5, max_words=50, overlap=10):
+    """
+    Splits the text into chunks and returns the most relevant chunks based on
+    similarity to the query.
+
+    Examples:
+        >>> text = "Python is a programming language. It is used for data science. Java is also popular."
+        >>> result = find_relevant_chunks(text, "What is Python?", num_chunks=1)
+        >>> round(result[0][1], 2)
+        0.14
+        >>> "Python is a programming language" in result[0][0]
+        True
+    """
+    chunks = chunk_text_by_words(text, max_words=max_words, overlap=overlap)
+    scored_chunks = [(chunk, score_chunk(chunk, query)) for chunk in chunks]
+    scored_chunks.sort(key=lambda x: x[1], reverse=True)
+    return scored_chunks[:num_chunks]
 
 if __name__ == '__main__':
     messages = []
