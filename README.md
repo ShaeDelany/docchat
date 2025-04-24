@@ -28,4 +28,6 @@ docchat> what is it about?
 The document is about the Declaration of Independence, which states that the 13 American colonies are free and independent states, and lists the grievances against King George III of Great Britain, concluding that it is the duty of the people to establish a new government when the existing one is destructive of their rights and liberties.
 docchat>
 ```
+## GIF Demo!
+
 ![Demo of DocChat](docs/docchat.gif)
