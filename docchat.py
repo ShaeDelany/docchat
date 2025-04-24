@@ -1,14 +1,14 @@
 # $ /usr/local/bin/python3 docchat.py
 
 import os
+import sys
 import readline
-from dotenv import load_dotenv
 import requests
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-import fitz 
+import fitz
 import base64
-from PIL import Image
+from dotenv import load_dotenv
 
 import nltk
 from nltk.tokenize import word_tokenize
@@ -190,8 +190,6 @@ def find_relevant_chunks(text, query, num_chunks=5, max_words=50, overlap=10):
     scored_chunks.sort(key=lambda x: x[1], reverse=True)
     return scored_chunks[:num_chunks]
 
-import sys
-
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Usage: python docchat.py <file_path_or_url>")
@@ -206,7 +204,7 @@ if __name__ == '__main__':
     ]
 
     summary = llm(summary_prompt)
-    print(summary)
+    # print(summary)
 
     messages = [{
         "role": "system",
