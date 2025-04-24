@@ -1,11 +1,14 @@
+# $ /usr/local/bin/python3 docchat.py
+
 import os
 import readline
 from dotenv import load_dotenv
 import requests
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-import PyPDF2
-
+import fitz 
+import base64
+from PIL import Image
 
 import nltk
 from nltk.tokenize import word_tokenize
@@ -38,7 +41,7 @@ def llm(messages, temperature=1):
     return chat_completion.choices[0].message.content
 
 
-def chunk_text_by_words(text, max_words=5, overlap=2):
+def chunk_text_by_words(text, max_words=100, overlap=50):
     """
     Splits text into overlapping chunks by word count.
 
@@ -136,9 +139,11 @@ def load_text(filepath_or_url):
         except:
             return False
 
-    def extract_pdf_text(file):
-        reader = PyPDF2.PdfReader(file)
-        return "\n".join(page.extract_text() or "" for page in reader.pages)
+    def extract_pdf_text(file_path):
+        doc = fitz.open(file_path)
+        text = "\n".join(page.get_text() for page in doc)
+        doc.close()
+        return text
 
     def extract_html_text(html):
         soup = BeautifulSoup(html, "html.parser")
@@ -151,17 +156,20 @@ def load_text(filepath_or_url):
         if 'text/html' in content_type:
             return extract_html_text(response.text)
         elif 'application/pdf' in content_type:
-            return extract_pdf_text(response.content)
+            with open("temp.pdf", "wb") as f:
+                f.write(response.content)
+            return extract_pdf_text("temp.pdf")
         else:
             return response.text
+    
     else:
         if not os.path.exists(filepath_or_url):
             raise FileNotFoundError(f"No such file: '{filepath_or_url}'")
         ext = os.path.splitext(filepath_or_url)[1].lower()
-        with open(filepath_or_url, 'rb') as f:
-            if ext == '.pdf':
-                return extract_pdf_text(f)
-            else:
+        if ext == '.pdf':
+            return extract_pdf_text(filepath_or_url)  
+        else:
+            with open(filepath_or_url, 'rb') as f:
                 return f.read().decode('utf-8', errors='ignore')
 
 def find_relevant_chunks(text, query, num_chunks=5, max_words=50, overlap=10):
@@ -182,24 +190,34 @@ def find_relevant_chunks(text, query, num_chunks=5, max_words=50, overlap=10):
     scored_chunks.sort(key=lambda x: x[1], reverse=True)
     return scored_chunks[:num_chunks]
 
-if __name__ == '__main__':
-    messages = []
-    messages.append({
-        "role": "system",
-        "content": "Your are a helpful assistant. You always speak like a pirate. You always answer in one sentence"
-    })
-    while True:
-        text = input('docchat> ')
-        messages.append({
-            'role': 'user',
-            'content': text,
-        })
-        result = llm(messages)
+import sys
 
-        messages.append({
-            'role': 'assistant',
-            'content': result
-        })
-        print('result=', result)
-        import pprint
-        pprint.pprint(messages)
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("Usage: python docchat.py <file_path_or_url>")
+        sys.exit(1)
+
+    file_path_or_url = sys.argv[1]
+    full_text = load_text(file_path_or_url)
+    
+    summary_prompt = [
+    {"role": "system", "content": "Summarize this document in a few sentences."},
+    {"role": "user", "content": full_text[:3000]}  # send only the first 3,000 characters
+    ]
+
+    summary = llm(summary_prompt)
+    print(summary)
+
+    messages = [{
+        "role": "system",
+        "content": "You are a helpful assistant that answers questions based on the provided document."
+    }]
+
+    while True:
+        query = input("docchat> ")
+        top_chunks = find_relevant_chunks(full_text, query, num_chunks=3)
+        context = f"{summary}\n\n" + "\n".join([chunk for chunk, _ in top_chunks]) + f"\n\nQuestion: {query}"
+        messages.append({"role": "user", "content": context})
+        result = llm(messages[-2:])
+        messages.append({"role": "assistant", "content": result})
+        print(result)
