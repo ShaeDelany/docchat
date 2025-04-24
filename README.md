@@ -18,7 +18,7 @@ DocChat is a Python-based conversational assistant that is designed to analyze, 
 There is a file in this repository named **requirements.txt**. This has all the required installments that are needed in order for this program to run. Run this in your terminal:
 ```$ pip3 install -r requirements.txt```
 
-Once everything is installed you can run the program to chat with DocChat! Heres an example of how you can use it. 
+Once everything is installed you can run the program to chat with DocChat! Heres an example of how my program answers the question well. 
 
 ```
 $ python3 docchat.py docs/declaration
@@ -28,6 +28,20 @@ docchat> what is it about?
 The document is about the Declaration of Independence, which states that the 13 American colonies are free and independent states, and lists the grievances against King George III of Great Britain, concluding that it is the duty of the people to establish a new government when the existing one is destructive of their rights and liberties.
 docchat>
 ```
+
+You want to watch for how your program responds to the given prompt in your code. For instance, this shows a bad example where the program answers the questions poorly. 
+
+```
+$ python3 docchat.py docs/declaration
+docchat> what is this document?
+Declaration o' Indy
+docchat> what is it about?
+Doing some revolution-stuff!
+docchat>
+```
+
+You can help this by going to the *messages* accumulator and editing the 'content' on line 211 of **docchat.py** program file.
+
 ## GIF Demo!
 
 ![Demo of DocChat](docs/docchat.gif)
