@@ -3,7 +3,14 @@ from groq import Groq
 import groq
 import os
 from dotenv import load_dotenv
-import spacy
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 load_dotenv()
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
@@ -19,7 +26,6 @@ def llm(messages, temperature=1):
     ...     ], temperature=0)
     'The capital of France is Paris!'
     '''
-    import groq
     client = groq.Groq()
 
     chat_completion = client.chat.completions.create(
@@ -79,41 +85,18 @@ def load_spacy_model(language: str):
 
 
 def score_chunk(chunk: str, query: str, language: str = "french") -> float:
-    """
-    Scores a chunk against a user query using Jaccard similarity of lemmatized word sets
-    with stopword removal, using spaCy for multilingual support.
+    if language != "english":
+        raise ValueError("Only English is supported with NLTK in this version.")
 
-    Examples (French):
-        >>> round(score_chunk("Le soleil est brillant et chaud.", "Quelle est la température du soleil ?", language="french"), 2)
-        0.33
-        >>> round(score_chunk("La voiture rouge roule rapidement.", "Quelle est la couleur de la voiture ?", language="french"), 2)
-        0.25
-        >>> score_chunk("Les bananes sont jaunes.", "Comment fonctionnent les avions ?", language="french")
-        0.0
-
-    Examples (Spanish):
-        >>> round(score_chunk("El sol es brillante y caliente.", "¿Qué temperatura tiene el sol?", language="spanish"), 2)
-        0.33
-        >>> round(score_chunk("El coche rojo va muy rápido.", "¿De qué color es el coche?", language="spanish"), 2)
-        0.25
-        >>> score_chunk("Los plátanos son amarillos.", "¿Cómo vuelan los aviones?", language="spanish")
-        0.0
-
-    Examples (English):
-        >>> round(score_chunk("The sun is bright and hot.", "How hot is the sun?", language="english"), 2)
-        0.5
-        >>> round(score_chunk("The red car is speeding down the road.", "What color is the car?", language="english"), 2)
-        0.25
-        >>> score_chunk("Bananas are yellow.", "How do airplanes fly?", language="english")
-        0.0
-    """
-    nlp = load_spacy_model(language)
+    stop_words = set(stopwords.words('english'))
+    lemmatizer = WordNetLemmatizer()
 
     def preprocess(text):
-        doc = nlp(text.lower())
+        tokens = word_tokenize(text.lower())
         return set(
-            token.lemma_ for token in doc
-            if token.is_alpha and not token.is_stop
+            lemmatizer.lemmatize(token)
+            for token in tokens
+            if token.isalpha and token not in stop_words
         )
 
     chunk_words = preprocess(chunk)
