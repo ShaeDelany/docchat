@@ -18,7 +18,7 @@ DocChat is a Python-based conversational assistant that is designed to analyze, 
 There is a file in this repository named **requirements.txt**. This has all the required installments that are needed in order for this program to run. Run this in your terminal:
 ```$ pip3 install -r requirements.txt```
 
-Once everything is installed you can run the program to chat with DocChat! Heres an example of how my program answers the question well. 
+Once everything is installed you can run the program to chat with DocChat! Here's an example of how my program answers the question well. 
 
 ```
 $ python3 docchat.py docs/declaration
@@ -40,7 +40,7 @@ Doing some revolution-stuff!
 docchat>
 ```
 
-You can help this by going to the *messages* accumulator and editing the 'content' on line 211 of **docchat.py** program file.
+You can help this by going to the *messages* accumulator and editing the 'content' on line 211 of the **docchat.py** program file in the repository.
 
 ## GIF Demo!
 
