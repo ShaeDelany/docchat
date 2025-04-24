@@ -5,5 +5,3 @@ groq
 nltk
 requests
 PyPDF2
-Pillow
-
