@@ -1,6 +1,11 @@
 import os
 import readline
 from dotenv import load_dotenv
+import requests
+from urllib.parse import urlparse
+from bs4 import BeautifulSoup
+import PyPDF2
+
 
 import nltk
 from nltk.tokenize import word_tokenize
@@ -74,7 +79,7 @@ def score_chunk(chunk: str, query: str, language: str = "english") -> float:
     """
     Scores a chunk of text against a query using Jaccard similarity between 
     sets of lemmatized words with stopwords removed.
-    
+
     Examples:
         >>> round(score_chunk("The sun is bright and hot.", "How hot is the sun?"), 2)
         0.67
@@ -107,6 +112,57 @@ def score_chunk(chunk: str, query: str, language: str = "english") -> float:
     union = chunk_words | query_words
 
     return len(intersection) / len(union)
+
+def load_text(filepath_or_url):
+    """
+    Loads text from a local file or a URL. Supports plain text, HTML, and PDF formats.
+    Examples:
+        >>> text = load_text("docs/constitution-mx.txt")
+        >>> "Constitución" in text
+        True
+
+        >>> text = load_text("docs/research_paper.pdf")
+        >>> "Abstract" in text  # Replace with any real word in the PDF
+        True
+
+        >>> text = load_text("https://example.com")
+        >>> "Example Domain" in text
+        True
+    """
+    def is_url(path):
+        try:
+            result = urlparse(path)
+            return result.scheme in ('http', 'https')
+        except:
+            return False
+
+    def extract_pdf_text(file):
+        reader = PyPDF2.PdfReader(file)
+        return "\n".join(page.extract_text() or "" for page in reader.pages)
+
+    def extract_html_text(html):
+        soup = BeautifulSoup(html, "html.parser")
+        return soup.get_text(separator=' ', strip=True)
+
+    if is_url(filepath_or_url):
+        response = requests.get(filepath_or_url)
+        response.raise_for_status()
+        content_type = response.headers.get('Content-Type', '')
+        if 'text/html' in content_type:
+            return extract_html_text(response.text)
+        elif 'application/pdf' in content_type:
+            return extract_pdf_text(response.content)
+        else:
+            return response.text
+    else:
+        if not os.path.exists(filepath_or_url):
+            raise FileNotFoundError(f"No such file: '{filepath_or_url}'")
+        ext = os.path.splitext(filepath_or_url)[1].lower()
+        with open(filepath_or_url, 'rb') as f:
+            if ext == '.pdf':
+                return extract_pdf_text(f)
+            else:
+                return f.read().decode('utf-8', errors='ignore')
 
 
 if __name__ == '__main__':
