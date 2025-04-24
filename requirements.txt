@@ -4,3 +4,5 @@ PyMuPDF
 groq
 nltk
 requests
+PyPDF2
+
