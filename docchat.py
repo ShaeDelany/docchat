@@ -1,5 +1,3 @@
-# $ /usr/local/bin/python3 docchat.py
-
 import os
 import sys
 import readline
@@ -200,7 +198,7 @@ if __name__ == '__main__':
     
     summary_prompt = [
     {"role": "system", "content": "Summarize this document in a few sentences."},
-    {"role": "user", "content": full_text[:3000]}  # send only the first 3,000 characters
+    {"role": "user", "content": full_text[:3000]}  
     ]
 
     summary = llm(summary_prompt)
