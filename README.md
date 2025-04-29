@@ -4,19 +4,13 @@ DocChat is a Python-based conversational assistant that is designed to analyze, 
 
 ![test cases](https://github.com/shaedelany/docchat/workflows/tests/badge.svg)
 
-## Features
-- Extracts and summarizes content
-- Interfaces with LLMs (via `groq` or compatible API)
-- Cleans and lemmatizes text with `nltk`
-- Uses `BeautifulSoup` for web parsing 
-
-## Files
-- `docchat.py`: Main interface and document interaction logic
-- `docsum.py`: Text summarization and NLP logic
+![Demo of DocChat](docs/docchat.gif)
 
 ## Installation and Example Usage
-There is a file in this repository named **requirements.txt**. This has all the required installments that are needed in order for this program to run. Run this in your terminal:
-```$ pip3 install -r requirements.txt```
+There is a file in this repository named `requirements.txt`. This has all the required installments that are needed in order for this program to run. Run this in your terminal:
+```
+$ pip3 install -r requirements.txt
+```
 
 Once everything is installed you can run the program to chat with DocChat! Here's an example of how my program answers the questions well. 
 
@@ -40,8 +34,15 @@ Doing some revolution-stuff!
 docchat>
 ```
 
-You can help this by going to the *messages* accumulator and editing the 'content' on line 211 of the **docchat.py** program file in this repository.
+You can help this by going to the `messages` accumulator and editing the 'content' on line 211 of the `docchat.py` program file in this repository.
 
-## GIF Demo!
+## Features
+- Extracts and summarizes content
+- Interfaces with LLMs (via `groq` or compatible API)
+- Cleans and lemmatizes text with `nltk`
+- Uses `BeautifulSoup` for web parsing 
 
-![Demo of DocChat](docs/docchat.gif)
+## Files
+- `docchat.py`: Main interface and document interaction logic
+- `docsum.py`: Text summarization and NLP logic
+
